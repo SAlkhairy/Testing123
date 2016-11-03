@@ -64,7 +64,7 @@ def edit_post(request):
             if form.is_valid():
                 form.save()
         else:
-            message = "You are unauthorized to edit this post."
+            "You are unauthorized to edit this post."
 
 
 @login_required
@@ -79,7 +79,14 @@ def delete_post(request):
 def view_post(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     context = {'post': post}
-    return render(request, 'accounts/base.html', context)
+    return render(request, 'accounts/***.html', context)
+
+
+
+def user_media(request):
+    posts = Post.objects.filter(image=True)
+    context = {'posts': posts}
+    return render(request, 'accounts/***.html', context)
 
 
 
@@ -88,6 +95,7 @@ def timeline(request, user_id): # I need to come up with new terminology.
     #home> logged in > timeline
     #home> not logged in > welcome page + sign up or sign in
     #timeline: posts of user + following , chronological order
+    #posts = Post.objects.order_by('datetime')
     pass
 
 
@@ -100,16 +108,17 @@ def user_page(user_id):
 def search_result():
     pass
 
+
+
 def user_settings():
     pass
 
-def user_media():
-    pass
+
 
 def following():
     pass
 
+
+
 def followers(): # I seriously need to come up with new terminology.
     pass
-
-#add post , view post, add timeline,
