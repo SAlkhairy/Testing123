@@ -1,17 +1,25 @@
-from django.shortcuts import render , get_object_or_404
-from django.http import HttpResponse , HttpResponseRedirect
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse, HttpResponseRedirect
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 from accounts.models import Post
-from accounts.forms import UserForm, CommonProfileForm, PostForm
+from accounts.forms import CommonProfileForm, PostForm, EditCommonProfileForm
 
+
+
+def index(request):
+    if request.user.is_authenticated():
+        return HttpResponseRedirect(reverse('timeline'))
+    else:
+        return HttpResponseRedirect(reverse('home'))
 
 
 def home(request):
-    #home> logged in > timeline
-    #home> not logged in > welcome page + sign up or sign in
-    pass
+    #I need a sign-in option
+    return HttpResponse('Hello -trial-')
 
 
 
@@ -37,34 +45,55 @@ def registration(request):
         else:
             print user_form.errors, commonprofile_form.errors
 
-    return
+    return HttpResponseRedirect()
 
 
 
 @login_required
 def add_post(request):
+    try:
+         post = request.user.post
+    except ObjectDoesNotExist:
+        return HttpResponseRedirect(reverse('timeline'))
     if request.method == 'POST':
-        form = PostForm(request.POST)
+        form = PostForm(request.POST, instance=post)
         if form.is_valid():
             form.save(commit=True)
-            return HttpResponseRedirect(reverse('timeline'))
+            return HttpResponseRedirect('timeline')
         else:
             print form.errors
-    else:
-        form = PostForm()
+
+    elif request.method == 'GET':
+        form = PostForm(request.GET, instance=post)
+        return render(request, 'accounts/***.html')
+
+    return render(request, 'accounts/add_post.html', {'form': form })
 
 
 
 @login_required
-def edit_post(request):
+def edit_post(request, post_id):
+    try:
+        post = request.user.post(pk=post_id)
+    except ObjectDoesNotExist:
+        return HttpResponseRedirect(reverse('home'))
+
+    if not request.user.is_superuser and\
+    not request.user == post.user:
+        raise PermissionDenied
+
     if request.method == 'POST':
-        post = get_object_or_404(Post, pk=request.POST['id'])
         if post.user == request.user:
             form = PostForm(request.POST, instance=post)
             if form.is_valid():
                 form.save()
-        else:
-            "You are unauthorized to edit this post."
+                return HttpResponseRedirect(reverse('timeline'))
+
+    elif request.method == 'GET':
+        form = PostForm(request.GET, instance=post)
+
+    return render(request, 'accounts/edit_post.html', {'form':form} )
+
 
 
 @login_required
@@ -73,52 +102,62 @@ def delete_post(request):
         post = get_object_or_404(Post, pk=request.POST['id'])
         if post.user == request.user:
             post.delete()
-
+            return HttpResponseRedirect('home')
+#not linked to template!
 
 
 def view_post(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     context = {'post': post}
+    #HttpResponseRedirect(reverse('edit_post')
     return render(request, 'accounts/***.html', context)
 
 
 
 def user_media(request):
-    posts = Post.objects.filter(image=True)
-    context = {'posts': posts}
-    return render(request, 'accounts/***.html', context)
+    media = Post.objects.exclude(image="")
+    context = {'media': media}
+    return render(request, 'accounts/user_media.html', context)
 
 
 
-def timeline(request, user_id): # I need to come up with new terminology.
-    #planning with myself
-    #home> logged in > timeline
-    #home> not logged in > welcome page + sign up or sign in
-    #timeline: posts of user + following , chronological order
-    #posts = Post.objects.order_by('datetime')
-    pass
+def timeline(request): # I need to come up with new terminology.
+    posts = Post.objects.filter(user__in=request.user.following.all()).order_by('submission_date')
+    return HttpResponseRedirect(render(request, 'accounts/timeline.html', {'posts':posts}))
 
 
 
-def user_page(user_id):
-    username= user_id
-    return username
+@login_required
+def edit_common_profile(request):
+    try:
+         common_profile = request.user.common_profile
+    except ObjectDoesNotExist:
+        return HttpResponseRedirect(reverse('home'))
+
+    if request.method == 'POST':
+        form = EditCommonProfileForm(request.POST, instance=common_profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your changes have been saved.')
+            return HttpResponseRedirect(reverse('edit_common_profile'))
+    elif request.method == 'GET':
+        form = EditCommonProfileForm(instance=common_profile)
+
+
+    return render(request, 'accounts/edit_common_profile.html', {'form':form, 'common_profile':common_profile})
+
+
+
+def following_list(request):
+    users = request.user.common_profile.following.all().order_by('follow_date')
+    return render(request, 'accounts/following_list.html', {'users':users})
+
+
+def followers_list(request):
+    users = request.user.common_profile.followed_by.all().order_by('follow_date')
+    return render(request, 'accounts/.html', {'users':users})
+
 
 
 def search_result():
-    pass
-
-
-
-def user_settings():
-    pass
-
-
-
-def following():
-    pass
-
-
-
-def followers(): # I seriously need to come up with new terminology.
     pass

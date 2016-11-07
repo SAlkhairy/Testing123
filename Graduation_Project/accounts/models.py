@@ -17,22 +17,28 @@ class CommonProfile(UserenaBaseProfile):
                                     upload_to=None,
                                     height_field=None,
                                     width_field=None)
-    interests = models.TextField()
+    about = models.TextField()
+    following = models.ManyToManyField('self',
+                                       symmetrical=False,
+                                       related_name='followed_by')
 
     def __unicode__(self):
-        return self.username
+        return self.user.username
 
 
 class Post(models.Model):
     user = models.ForeignKey(User)
+    #post = models.ManyToManyField()
+    #for posting replies
     text = models.TextField()
     image = models.ImageField(blank=True)
-    datetime = models.DateTimeField(auto_now_add=True)
+    submission_date = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
         return self.text
 
-
+#This should have been one with the post =P
+#delete it?
 class Comment(models.Model):
     user = models.ForeignKey(User)
     # shouldn't it be for a specific post as well?
@@ -42,24 +48,3 @@ class Comment(models.Model):
 
     def __unicode__(self):
         return self.text
-
-
-class Following(models.Model):
-    user = models.ForeignKey(CommonProfile)
-    # can be removed active = models.BooleanField()
-    follow_date = models.DateTimeField(auto_now_add=True)
-
-    def __unicode__(self):
-        return self.follow_user
-
-
-#below is just a trial
-
-class RelativeUser(): #AbstractBaseUser, PermissionsMixin
-relationships = models.ManyToManyField('self', through='Relationship',
-                                           symmetrical=False,
-                                           related_name='related_to')
-class Relationship(models.Model):
-from_user = models.ForeignKey(RelativeUser, related_name='from_people')
-to_user = models.ForeignKey(RelativeUser, related_name='to_people')
-

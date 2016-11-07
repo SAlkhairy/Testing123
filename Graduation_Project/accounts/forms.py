@@ -1,20 +1,27 @@
+from django import forms
 from django.forms import ModelForm
-from django.contrib.auth.models import User
-from accounts.models import Post, CommonProfile
-from django import formsclass
+from accounts.models import Post
 
-UserForm(forms.ModelForm):
+from userena.forms import SignupForm
+
+class CommonProfileForm(SignupForm):
     password = forms.CharField(widget=forms.PasswordInput())
     class Meta:
-        model = User
-        fields = ('username', 'email', 'password')
+        fields = ['username', 'email',
+                  'password', 'human_name',
+                  'pet_name', 'pet_type',
+                  'profile_pic', 'about']
 
-class CommonProfileForm(forms.ModelForm):
-    class Meta:
-        model = CommonProfile
-        fields = ['human_name', 'pet_name', 'pet_type', 'profile_pic', 'interests']
-        
-class PostForm(ModelForm):
+
+class PostForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = ['text', 'image']
+
+
+class EditCommonProfileForm(forms.ModelForm):
+    class Meta:
+        fields = ['username', 'email',
+                  'password', 'human_name',
+                  'pet_name', 'pet_type',
+                  'profile_pic', 'about']
