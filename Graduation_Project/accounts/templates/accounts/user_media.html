@@ -1,0 +1,11 @@
+{% extends 'accounts/base.html' %}
+{% block title %}Say Something to the World{% endblock %}
+{% block body %}
+
+    <ul>
+        {% for image in media %}
+            <li>{{ image }}</li>
+        {% endfor %}
+    </ul>
+
+{% endblock %}

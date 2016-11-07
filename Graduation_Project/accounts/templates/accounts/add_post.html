@@ -1,0 +1,15 @@
+{% extends 'accounts/base.html' %}
+{% block title %}Say Something to the World{% endblock %}
+{% block body %}
+
+    <form method="post">
+        <input type="text" name="Post" value="What shall it be?"><br>
+            <!--I found this, let's see how it works. -->
+            <form method="post" enctype="multipart/form-data">
+            <label for="image">Image:</label>
+            <input type="image" name="image" id="image" /><br>
+            </form>
+        <input type="submit" value="Post">
+    </form>
+
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends 'accounts/base.html' %}
+{% block title %}Say Something to the World{% endblock %}
+{% block body %}
+
+    <form method="post">
+        <input type="text" name="Post" value={{post.text}}><br>
+        <input type="file" name="Image" value={{post.image}}><br>
+        <input type="submit" value="Post">
+    </form>
+
+{% endblock %}

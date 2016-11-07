@@ -1,0 +1,11 @@
+{% extends 'accounts/base.html' %}
+{% block title %}{% endblock %}
+{% block body %}
+
+    {{post.user}}<br>
+    {{post.text}}<br>
+    {{post.image}}<br>
+    {{post.submission_date}}<br>
+    <a href= "{% url 'edit_post' %}"> Edit </a>
+
+{% endblock %}

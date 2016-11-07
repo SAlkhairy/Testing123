@@ -1,0 +1,12 @@
+{% extends 'accounts/base.html' %}
+{% block title %}followed by {{username}} {% endblock %}
+<!--I need to specify which user's name is in the title -->
+{% block body %}
+
+    <ul>
+        {% for person in users %}
+            <li>{{ person.username }}</li>
+        {% endfor %}
+    </ul>
+
+{% endblock %}
