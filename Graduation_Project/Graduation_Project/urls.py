@@ -22,7 +22,8 @@ from accounts import views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^accounts/', include(accounts_urls, 'userena.urls')),
-    url(r'^', views.home),
+    url(r'^home/', views.home, name='home'),
+    url(r'^', views.index, name='index'),
 
 ]
 
