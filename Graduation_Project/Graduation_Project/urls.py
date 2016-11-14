@@ -20,10 +20,9 @@ from accounts import views
 
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-    url(r'^accounts/', include(accounts_urls, 'userena.urls')),
-    url(r'^home/', views.home, name='home'),
-    url(r'^', views.index, name='index'),
+    url(r'^admin/', include(admin.site.urls)),
+    url(r'^accounts/', include('userena.urls')),
+    url(r'^home/$', views.home, name='home'),
+    url(r'^', include(accounts_urls)),
 
 ]
-
